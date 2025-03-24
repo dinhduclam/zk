@@ -31,7 +31,7 @@ const userData: UserDatabase = {
 app.post('/api/financial-proof/:userId', async (req, res) => {
   try {
     const { userId } = req.params;
-    const { requiredBalance } = req.body;
+    const { requiredBalance, requiredNoBadDebt } = req.body;
     const user = userData[userId];
 
     if (!user) {
@@ -42,7 +42,8 @@ app.post('/api/financial-proof/:userId', async (req, res) => {
     const proof = await generateProof({
       accountBalance: user.accountBalance,
       hasBadDebt: user.hasBadDebt,
-      requiredBalance: Number(requiredBalance)
+      requiredBalance: Number(requiredBalance),
+      requiredNoBadDebt: requiredNoBadDebt
     });
 
     console.log("Proof generated: ", proof);

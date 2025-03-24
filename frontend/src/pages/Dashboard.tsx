@@ -117,9 +117,6 @@ const Dashboard: React.FC = () => {
                   • Bad Debt: {pkg.requirements.noBadDebt ? 'Not Allowed' : 'Allowed'}
                 </Typography>
                 <Typography variant="body2" color="textSecondary">
-                  • Marital Status: {['Single', 'Married', 'Divorced', 'Widowed'][pkg.requirements.maritalStatuses]}
-                </Typography>
-                <Typography variant="body2" color="textSecondary">
                   • Criminal Record: {pkg.requirements.criminalRecord === 0 ? 'Not Allowed' : 'Allowed'}
                 </Typography>
               </CardContent>

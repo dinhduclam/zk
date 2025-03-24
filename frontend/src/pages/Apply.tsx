@@ -23,7 +23,6 @@ export const Apply: React.FC = () => {
             accountBalance: formData.accountBalance,
             hasBadDebt: formData.hasBadDebt,
             age: formData.age,
-            maritalStatus: formData.maritalStatus,
             hasCriminalRecord: formData.hasCriminalRecord,
           }
         }),

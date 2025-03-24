@@ -9,12 +9,10 @@ interface Proof {
 
 interface PersonalData {
   age: number;
-  maritalStatus: string;
   hasCriminalRecord: boolean;
   monthlyIncome: number;
   requiredMinimumAge: number;
   requiredMaximumAge: number;
-  requiredMaritalStatus: string;
   requiredMonthlyIncome: number;
   requiredCriminalRecord: boolean;
 }
@@ -28,14 +26,12 @@ export async function generateProof(data: PersonalData): Promise<Proof> {
   try {
     const input = {
       age: data.age,
-      maritalStatus: data.maritalStatus,
-      hasCriminalRecord: data.hasCriminalRecord,
+      hasCriminalRecord: data.hasCriminalRecord ? 1 : 0,
       monthlyIncome: data.monthlyIncome,
       requiredMinimumAge: data.requiredMinimumAge,
       requiredMaximumAge: data.requiredMaximumAge,
-      requiredMaritalStatus: data.requiredMaritalStatus,
       requiredMonthlyIncome: data.requiredMonthlyIncome,
-      requiredCriminalRecord: data.requiredCriminalRecord
+      requiredCriminalRecord: data.requiredCriminalRecord ? 1 : 0
     };
 
     await snarkjs.wtns.calculate(input, CIRCUIT_PATH, WITNESS_PATH);

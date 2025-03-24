@@ -44,9 +44,9 @@ export async function verifyCivilProof(proof: Proof): Promise<boolean> {
     // Load verification key
     const vKey = JSON.parse(fs.readFileSync(path.join(__dirname, '../../../civil-server/circuits/verification_key.json'), 'utf8'));
 
-    const [verifiedAge, verifiedMaritalStatus, verifiedIncome, verifiedCriminalRecord] = proof.publicSignals;
+    const [verifiedAge, verifiedIncome, verifiedCriminalRecord] = proof.publicSignals;
 
-    if (Number(verifiedAge) != 1 || Number(verifiedMaritalStatus) != 1 || Number(verifiedIncome) != 1 || Number(verifiedCriminalRecord) != 1) {
+    if (Number(verifiedAge) != 1 || Number(verifiedIncome) != 1 || Number(verifiedCriminalRecord) != 1) {
       return false;
     }
 

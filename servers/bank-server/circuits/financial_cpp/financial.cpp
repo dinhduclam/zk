@@ -23,15 +23,15 @@ NULL,
 NULL };
 uint get_main_input_signal_start() {return 3;}
 
-uint get_main_input_signal_no() {return 3;}
+uint get_main_input_signal_no() {return 4;}
 
-uint get_total_signal_no() {return 266;}
+uint get_total_signal_no() {return 267;}
 
 uint get_number_of_components() {return 4;}
 
 uint get_size_of_input_hashmap() {return 256;}
 
-uint get_size_of_witness() {return 260;}
+uint get_size_of_witness() {return 261;}
 
 uint get_size_of_constants() {return 5;}
 
@@ -326,7 +326,7 @@ void FinancialVerification_3_create(uint soffset,uint coffset,Circom_CalcWit* ct
 ctx->componentMemory[coffset].templateId = 3;
 ctx->componentMemory[coffset].templateName = "FinancialVerification";
 ctx->componentMemory[coffset].signalStart = soffset;
-ctx->componentMemory[coffset].inputCounter = 3;
+ctx->componentMemory[coffset].inputCounter = 4;
 ctx->componentMemory[coffset].componentName = componentName;
 ctx->componentMemory[coffset].idFather = componentFather;
 ctx->componentMemory[coffset].subcomponents = new uint[1]{0};
@@ -335,7 +335,7 @@ ctx->componentMemory[coffset].subcomponents = new uint[1]{0};
 void FinancialVerification_3_run(uint ctx_index,Circom_CalcWit* ctx){
 FrElement* circuitConstants = ctx->circuitConstants;
 FrElement* signalValues = ctx->signalValues;
-FrElement expaux[2];
+FrElement expaux[4];
 FrElement lvar[0];
 u64 mySignalStart = ctx->componentMemory[ctx_index].signalStart;
 std::string myTemplateName = ctx->componentMemory[ctx_index].templateName;
@@ -350,7 +350,7 @@ uint index_multiple_eq;
 int cmp_index_ref_load = -1;
 {
 std::string new_cmp_name = "balanceCheck";
-GreaterThan_2_create(mySignalStart+5,0+ctx_index+1,ctx,new_cmp_name,myId);
+GreaterThan_2_create(mySignalStart+6,0+ctx_index+1,ctx,new_cmp_name,myId);
 mySubcomponents[0] = 0+ctx_index+1;
 }
 {
@@ -359,7 +359,7 @@ uint cmp_index_ref = 0;
 PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cmp_index_ref]].signalStart + 1];
 // load src
 // end load src
-Fr_copy(aux_dest,&signalValues[mySignalStart + 3]);
+Fr_copy(aux_dest,&signalValues[mySignalStart + 4]);
 }
 // no need to run sub component
 ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
@@ -389,7 +389,10 @@ Fr_copy(aux_dest,&ctx->signalValues[ctx->componentMemory[mySubcomponents[0]].sig
 {
 PFrElement aux_dest = &signalValues[mySignalStart + 1];
 // load src
-Fr_sub(&expaux[0],&circuitConstants[2],&signalValues[mySignalStart + 4]); // line circom 23
+Fr_sub(&expaux[2],&circuitConstants[2],&signalValues[mySignalStart + 5]); // line circom 30
+Fr_mul(&expaux[1],&expaux[2],&signalValues[mySignalStart + 3]); // line circom 30
+Fr_sub(&expaux[2],&circuitConstants[2],&signalValues[mySignalStart + 3]); // line circom 30
+Fr_add(&expaux[0],&expaux[1],&expaux[2]); // line circom 30
 // end load src
 Fr_copy(aux_dest,&expaux[0]);
 }

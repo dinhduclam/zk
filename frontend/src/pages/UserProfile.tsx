@@ -3,8 +3,7 @@ import {
   Box,
   Typography,
   Paper,
-  Grid,
-  Divider,
+  Grid
 } from '@mui/material';
 
 interface UserData {
@@ -12,7 +11,6 @@ interface UserData {
   monthlyIncome: number;
   hasBadDebt: boolean;
   age: number;
-  maritalStatus: string;
   hasCriminalRecord: boolean;
 }
 
@@ -31,7 +29,6 @@ const UserProfile: React.FC = () => {
           monthlyIncome: 20000000, // 20 million VND
           hasBadDebt: false,
           age: 25,
-          maritalStatus: 'Single',
           hasCriminalRecord: false,
         };
         setUserData(mockData);
@@ -108,9 +105,6 @@ const UserProfile: React.FC = () => {
               Age: {userData.age} years
             </Typography>
             <Typography gutterBottom>
-              Marital Status: {userData.maritalStatus}
-            </Typography>
-            <Typography gutterBottom>
               Criminal Record: {userData.hasCriminalRecord ? 'Yes' : 'No'}
             </Typography>
           </Paper>
@@ -139,11 +133,6 @@ const UserProfile: React.FC = () => {
           <Grid item xs={12}>
             <Typography>
               Bad Debt Check: {!userData.hasBadDebt ? '✓' : '✗'}
-            </Typography>
-          </Grid>
-          <Grid item xs={12}>
-            <Typography>
-              Marital Status: {['Single', 'Married'].includes(userData.maritalStatus) ? '✓' : '✗'}
             </Typography>
           </Grid>
           <Grid item xs={12}>

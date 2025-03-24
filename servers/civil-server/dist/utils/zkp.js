@@ -12,14 +12,12 @@ async function generateProof(data) {
     try {
         const input = {
             age: data.age,
-            maritalStatus: data.maritalStatus,
-            hasCriminalRecord: data.hasCriminalRecord,
+            hasCriminalRecord: data.hasCriminalRecord ? 1 : 0,
             monthlyIncome: data.monthlyIncome,
             requiredMinimumAge: data.requiredMinimumAge,
             requiredMaximumAge: data.requiredMaximumAge,
-            requiredMaritalStatus: data.requiredMaritalStatus,
             requiredMonthlyIncome: data.requiredMonthlyIncome,
-            requiredCriminalRecord: data.requiredCriminalRecord
+            requiredCriminalRecord: data.requiredCriminalRecord ? 1 : 0
         };
         await snarkjs.wtns.calculate(input, CIRCUIT_PATH, WITNESS_PATH);
         const { proof, publicSignals } = await snarkjs.groth16.prove(PROVING_KEY_PATH, WITNESS_PATH);

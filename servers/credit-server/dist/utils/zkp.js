@@ -22,8 +22,8 @@ async function verifyBankProof(proof) {
 async function verifyCivilProof(proof) {
     try {
         const vKey = JSON.parse(fs.readFileSync(path.join(__dirname, '../../../civil-server/circuits/verification_key.json'), 'utf8'));
-        const [verifiedAge, verifiedMaritalStatus, verifiedIncome, verifiedCriminalRecord] = proof.publicSignals;
-        if (Number(verifiedAge) != 1 || Number(verifiedMaritalStatus) != 1 || Number(verifiedIncome) != 1 || Number(verifiedCriminalRecord) != 1) {
+        const [verifiedAge, verifiedIncome, verifiedCriminalRecord] = proof.publicSignals;
+        if (Number(verifiedAge) != 1 || Number(verifiedIncome) != 1 || Number(verifiedCriminalRecord) != 1) {
             return false;
         }
         return await snarkjs.groth16.verify(vKey, proof.publicSignals, proof.proof);

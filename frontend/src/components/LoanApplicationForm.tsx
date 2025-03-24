@@ -27,7 +27,6 @@ export const LoanApplicationForm: React.FC<LoanApplicationFormProps> = ({ onSubm
     accountBalance: '',
     noBadDebt: '1',
     age: '',
-    maritalStatus: '0',
     hasCriminalRecord: '0',
   });
 
@@ -39,7 +38,6 @@ export const LoanApplicationForm: React.FC<LoanApplicationFormProps> = ({ onSubm
       accountBalance: Number(formData.accountBalance),
       age: Number(formData.age),
       noBadDebt: formData.noBadDebt === '1',
-      maritalStatus: Number(formData.maritalStatus),
       hasCriminalRecord: Number(formData.hasCriminalRecord),
     });
   };
@@ -81,20 +79,6 @@ export const LoanApplicationForm: React.FC<LoanApplicationFormProps> = ({ onSubm
                 onChange={(e) => setFormData({ ...formData, age: e.target.value })}
                 required
               />
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <FormControl component="fieldset">
-                <FormLabel>Marital Status</FormLabel>
-                <RadioGroup
-                  value={formData.maritalStatus}
-                  onChange={(e) => setFormData({ ...formData, maritalStatus: e.target.value })}
-                >
-                  <FormControlLabel value="0" control={<Radio />} label="Single" />
-                  <FormControlLabel value="1" control={<Radio />} label="Married" />
-                  <FormControlLabel value="2" control={<Radio />} label="Divorced" />
-                  <FormControlLabel value="3" control={<Radio />} label="Widowed" />
-                </RadioGroup>
-              </FormControl>
             </Grid>
             <Grid item xs={12} md={6}>
               <FormControl component="fieldset">

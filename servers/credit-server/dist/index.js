@@ -16,8 +16,7 @@ const userDatabase = {
     user1: {
         monthlyIncome: 8000,
         hasCriminalRecord: false,
-        age: 25,
-        maritalStatus: 1
+        age: 25
     }
 };
 app.get('/user/:userId', (req, res) => {
@@ -38,11 +37,11 @@ const loanPackages = [
         requirements: {
             minIncome: 5000000,
             minBalance: 20000000,
-            noBadDebt: false,
+            requireNoBadDebt: false,
             minAge: 18,
             maxAge: 60,
-            maritalStatuses: 0,
-            criminalRecord: 0
+            requireCriminalRecord: true,
+            requiredMaritalStatus: false
         }
     },
     {
@@ -54,11 +53,11 @@ const loanPackages = [
         requirements: {
             minIncome: 10000000,
             minBalance: 50000000,
-            noBadDebt: false,
+            requireNoBadDebt: false,
             minAge: 30,
             maxAge: 60,
-            maritalStatuses: 0,
-            criminalRecord: 0
+            requireCriminalRecord: false,
+            requiredMaritalStatus: true
         }
     }
 ];
@@ -79,6 +78,7 @@ app.post('/api/apply-loan', async (req, res) => {
             console.log('Loan package not found:', loanPackageId);
             return res.status(404).json({ error: 'Loan package not found' });
         }
+        console.log('---------------------------------------');
         console.log('Fetching financial proof from bank server...');
         const financialProof = await fetch(`http://localhost:3002/api/financial-proof/${userId}`, {
             method: 'POST',
@@ -86,7 +86,8 @@ app.post('/api/apply-loan', async (req, res) => {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                requiredBalance: loanPackage.requirements.minBalance
+                requiredBalance: loanPackage.requirements.minBalance,
+                requiredNoBadDebt: loanPackage.requirements.requireNoBadDebt
             })
         });
         const financialProofData = await financialProof.json();
@@ -96,6 +97,7 @@ app.post('/api/apply-loan', async (req, res) => {
             console.log('Financial proof verification failed');
             return res.status(400).json({ error: 'Financial proof verification failed' });
         }
+        console.log('---------------------------------------');
         console.log('Fetching civil proof from civil server...');
         const civilProof = await fetch(`http://localhost:3003/api/personal-proof/${userId}`, {
             method: 'POST',
@@ -105,9 +107,8 @@ app.post('/api/apply-loan', async (req, res) => {
             body: JSON.stringify({
                 requiredMinimumAge: loanPackage.requirements.minAge,
                 requiredMaximumAge: loanPackage.requirements.maxAge,
-                requiredMaritalStatus: loanPackage.requirements.maritalStatuses,
                 requiredMonthlyIncome: loanPackage.requirements.minIncome,
-                requiredCriminalRecord: loanPackage.requirements.criminalRecord
+                requiredCriminalRecord: loanPackage.requirements.requireCriminalRecord
             })
         });
         const civilProofData = await civilProof.json();
@@ -117,6 +118,7 @@ app.post('/api/apply-loan', async (req, res) => {
             console.log('Civil proof verification failed');
             return res.status(400).json({ error: 'Civil proof verification failed' });
         }
+        console.log('---------------------------------------');
         console.log('Loan application approved');
         return res.json({
             success: true,

@@ -4,34 +4,31 @@ include "../node_modules/circomlib/circuits/comparators.circom";
 template CivilVerification() {
     // Private inputs
     signal input age;
-    signal input maritalStatus;
     signal input hasCriminalRecord;
     signal input monthlyIncome;
     
     // Public inputs
     signal input requiredMaximumAge;
     signal input requiredMinimumAge;
-    signal input requiredMaritalStatus;
     signal input requiredMonthlyIncome;
     signal input requiredCriminalRecord;
     
     // Outputs
     signal output meetsAgeRequirement;
-    signal output meetsMaritalStatusRequirement;
     signal output meetsMonthlyIncomeRequirement;
     signal output meetsCriminalRecordRequirement;
     
-    // Verify balance requirement
-    component ageCheck = GreaterThan(252);
-    ageCheck.in[0] <== age;
-    ageCheck.in[1] <== requiredMinimumAge;
-    meetsAgeRequirement <== ageCheck.out;
+    // Verify age requirement (min <= age <= max)
+    component minAgeCheck = GreaterThan(252);
+    component maxAgeCheck = GreaterThan(252);
     
-    // Verify marital status
-    component maritalStatusCheck = IsEqual();
-    maritalStatusCheck.in[0] <== maritalStatus;
-    maritalStatusCheck.in[1] <== requiredMaritalStatus;
-    meetsMaritalStatusRequirement <== maritalStatusCheck.out;
+    minAgeCheck.in[0] <== age;
+    minAgeCheck.in[1] <== requiredMinimumAge;
+    
+    maxAgeCheck.in[0] <== requiredMaximumAge;
+    maxAgeCheck.in[1] <== age;
+    
+    meetsAgeRequirement <== minAgeCheck.out * maxAgeCheck.out;
 
     // Verify monthly income
     component monthlyIncomeCheck = GreaterThan(252);
@@ -40,10 +37,7 @@ template CivilVerification() {
     meetsMonthlyIncomeRequirement <== monthlyIncomeCheck.out;
 
     // Verify criminal record
-    component criminalRecordCheck = IsEqual();
-    criminalRecordCheck.in[0] <== hasCriminalRecord;
-    criminalRecordCheck.in[1] <== requiredCriminalRecord;
-    meetsCriminalRecordRequirement <== criminalRecordCheck.out;
+    meetsCriminalRecordRequirement <== (1 - hasCriminalRecord) * requiredCriminalRecord + (1 - requiredCriminalRecord);
 }
 
-component main { public [requiredMaximumAge, requiredMaritalStatus, requiredMonthlyIncome, requiredCriminalRecord, requiredMinimumAge] } = CivilVerification();
+component main { public [requiredMaximumAge, requiredMinimumAge, requiredMonthlyIncome, requiredCriminalRecord] } = CivilVerification();

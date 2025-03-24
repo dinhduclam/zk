@@ -16,7 +16,6 @@ const userData = {
     'user1': {
         name: 'Lam Dinh',
         age: 25,
-        maritalStatus: 'Single',
         hasCriminalRecord: false,
         monthlyIncome: 15000000
     }
@@ -24,18 +23,16 @@ const userData = {
 app.post('/api/personal-proof/:userId', async (req, res) => {
     try {
         const { userId } = req.params;
-        const { requiredMaritalStatus, requiredMonthlyIncome, requiredCriminalRecord, requiredMinimumAge, requiredMaximumAge } = req.body;
+        const { requiredMonthlyIncome, requiredCriminalRecord, requiredMinimumAge, requiredMaximumAge } = req.body;
         const user = userData[userId];
         if (!user) {
             return res.status(404).json({ error: 'User not found' });
         }
         const input = {
             age: user.age,
-            maritalStatus: user.maritalStatus === 'Single' ? '0' : '1',
             hasCriminalRecord: user.hasCriminalRecord,
             monthlyIncome: user.monthlyIncome,
             requiredMaximumAge,
-            requiredMaritalStatus,
             requiredMonthlyIncome,
             requiredCriminalRecord,
             requiredMinimumAge

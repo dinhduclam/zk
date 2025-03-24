@@ -6,6 +6,7 @@ interface FinancialData {
   accountBalance: number;
   hasBadDebt: boolean;
   requiredBalance: number;
+  requiredNoBadDebt: boolean;
 }
 
 interface Proof {
@@ -23,7 +24,8 @@ export async function generateProof(data: FinancialData): Promise<Proof> {
     const input = {
       accountBalance: data.accountBalance,
       hasBadDebt: data.hasBadDebt ? 1 : 0,
-      requiredBalance: data.requiredBalance
+      requiredBalance: data.requiredBalance,
+      requiredNoBadDebt: data.requiredNoBadDebt ? 1 : 0
     };
 
     // Generate witness

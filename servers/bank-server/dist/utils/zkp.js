@@ -14,7 +14,8 @@ async function generateProof(data) {
         const input = {
             accountBalance: data.accountBalance,
             hasBadDebt: data.hasBadDebt ? 1 : 0,
-            requiredBalance: data.requiredBalance
+            requiredBalance: data.requiredBalance,
+            requiredNoBadDebt: data.requiredNoBadDebt ? 1 : 0
         };
         // Generate witness
         await snarkjs.wtns.calculate(input, CIRCUIT_PATH, WITNESS_PATH);

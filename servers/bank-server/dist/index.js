@@ -22,7 +22,7 @@ const userData = {
 app.post('/api/financial-proof/:userId', async (req, res) => {
     try {
         const { userId } = req.params;
-        const { requiredBalance } = req.body;
+        const { requiredBalance, requiredNoBadDebt } = req.body;
         const user = userData[userId];
         if (!user) {
             return res.status(404).json({ error: 'User not found' });
@@ -31,7 +31,8 @@ app.post('/api/financial-proof/:userId', async (req, res) => {
         const proof = await (0, zkp_1.generateProof)({
             accountBalance: user.accountBalance,
             hasBadDebt: user.hasBadDebt,
-            requiredBalance: Number(requiredBalance)
+            requiredBalance: Number(requiredBalance),
+            requiredNoBadDebt: requiredNoBadDebt
         });
         console.log("Proof generated: ", proof);
         return res.json(proof);
