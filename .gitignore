@@ -1,40 +1,39 @@
 # Dependencies
 node_modules/
-/.pnp
-.pnp.js
-
-# Testing
-/coverage
-
-# Production
-/build
-/dist
-
-# Environment files
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-
-# Logs
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+package-lock.json
+yarn.lock
 
-# Editor directories and files
+# Build output
+dist/
+build/
+out/
+.next/
+.nuxt/
+.output/
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+.env.development
+.env.test
+.env.production
+
+# IDE and editor files
 .idea/
 .vscode/
 *.swp
 *.swo
 .DS_Store
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
+*.sublime-workspace
+*.sublime-project
 
 # TypeScript
 *.tsbuildinfo
+tsconfig.tsbuildinfo
 
 # ZKP specific
 *.ptau
@@ -44,8 +43,69 @@ yarn-error.log*
 *.sym
 *.wtns
 *.json
+circuits/verification_key.json
+circuits/financial.zkey
+circuits/financial.wasm
+circuits/financial.r1cs
+circuits/financial.sym
+circuits/financial.wtns
+circuits/pot12_0000.ptau
+circuits/pot12_0001.ptau
+circuits/pot12_final.ptau
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# Testing
+coverage/
+.nyc_output/
+.jest/
 
 # Temporary files
-*.log
 *.tmp
-*.temp 
+*.temp
+.cache/
+.temp/
+.tmp/
+
+# System Files
+.DS_Store
+Thumbs.db
+
+# Project specific
+servers/*/dist/
+servers/*/build/
+frontend/build/
+frontend/dist/
+frontend/.next/
+frontend/coverage/
+
+# Server specific
+servers/*/logs/
+servers/*/.env
+servers/*/.env.*
+servers/*/node_modules/
+
+# Frontend specific
+frontend/node_modules/
+frontend/.env
+frontend/.env.*
+frontend/.next/
+frontend/out/
+frontend/.cache/
+frontend/.temp/
+frontend/.tmp/
+
+# ZKP specific for all servers
+servers/*/circuits/*.ptau
+servers/*/circuits/*.zkey
+servers/*/circuits/*.wasm
+servers/*/circuits/*.r1cs
+servers/*/circuits/*.sym
+servers/*/circuits/*.wtns
+servers/*/circuits/*.json 
