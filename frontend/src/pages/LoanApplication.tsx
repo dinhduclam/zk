@@ -8,6 +8,7 @@ import {
   CircularProgress,
   Alert,
 } from '@mui/material';
+import { useUser } from '../contexts/UserContext';
 
 interface LoanPackage {
   _id: string;
@@ -27,6 +28,7 @@ interface LoanPackage {
 }
 
 const LoanApplication: React.FC = () => {
+  const { selectedUser } = useUser();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const [loading, setLoading] = React.useState(false);
@@ -71,7 +73,7 @@ const LoanApplication: React.FC = () => {
         },
         body: JSON.stringify({
           loanPackageId: selectedPackage._id,
-          userId: 'user1', // In a real app, this would come from authentication
+          userId: selectedUser?.id ?? 'user1',
         }),
       });
 

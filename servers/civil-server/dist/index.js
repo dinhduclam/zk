@@ -15,6 +15,22 @@ const port = process.env.PORT || 3003;
 app.use((0, cors_1.default)());
 app.use(express_1.default.json());
 (0, db_1.connectDB)();
+app.get('/api/users', async (_, res) => {
+    try {
+        const users = await CivilUser_1.CivilUser.find().select('userId age hasCriminalRecord');
+        const formattedUsers = users.map(user => ({
+            id: user.userId,
+            name: `User ${user.userId}`,
+            age: user.age,
+            hasCriminalRecord: user.hasCriminalRecord
+        }));
+        return res.json(formattedUsers);
+    }
+    catch (error) {
+        console.error('Error fetching users:', error);
+        return res.status(500).json({ error: 'Failed to fetch users' });
+    }
+});
 app.get('/api/user/:userId', async (req, res) => {
     try {
         const user = await CivilUser_1.CivilUser.findOne({ userId: req.params.userId });

@@ -5,6 +5,7 @@ import CssBaseline from '@mui/material/CssBaseline';
 import Container from '@mui/material/Container';
 import Box from '@mui/material/Box';
 
+import { UserProvider } from './contexts/UserContext';
 import Navbar from './components/Navbar';
 import Dashboard from './pages/Dashboard';
 import LoanApplication from './pages/LoanApplication';
@@ -26,6 +27,7 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
+      <UserProvider>
       <Router>
         <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
           <Navbar />
@@ -38,6 +40,7 @@ function App() {
           </Container>
         </Box>
       </Router>
+      </UserProvider>
     </ThemeProvider>
   );
 }

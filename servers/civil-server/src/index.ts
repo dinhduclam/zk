@@ -16,6 +16,23 @@ app.use(express.json());
 // Connect to MongoDB
 connectDB();
 
+// Get all users
+app.get('/api/users', async (_, res) => {
+  try {
+    const users = await CivilUser.find().select('userId age hasCriminalRecord');
+    const formattedUsers = users.map(user => ({
+      id: user.userId,
+      name: `User ${user.userId}`,
+      age: user.age,
+      hasCriminalRecord: user.hasCriminalRecord
+    }));
+    return res.json(formattedUsers);
+  } catch (error) {
+    console.error('Error fetching users:', error);
+    return res.status(500).json({ error: 'Failed to fetch users' });
+  }
+});
+
 // Get user civil data
 app.get('/api/user/:userId', async (req, res) => {
   try {
