@@ -14,13 +14,13 @@ const seedUsers = async () => {
         userId: 'user1',
         age: 25,
         hasCriminalRecord: false,
-        monthlyIncome: 2500000
+        monthlyIncome: 25000000
       },
       {
         userId: 'user2',
         age: 35,
         hasCriminalRecord: true,
-        monthlyIncome: 3000000
+        monthlyIncome: 30000000
       }
     ];
 

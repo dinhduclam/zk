@@ -53,7 +53,7 @@ app.post('/api/apply-loan', async (req, res) => {
         }
         console.log('---------------------------------------');
         console.log('Fetching civil proof from civil server...');
-        const civilProof = await fetch(`http://localhost:3003/api/personal-proof/${userId}`, {
+        const civilProof = await fetch(`http://localhost:3003/api/civil-proof/${userId}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
