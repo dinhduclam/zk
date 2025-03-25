@@ -6,28 +6,39 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
 const dotenv_1 = __importDefault(require("dotenv"));
+const db_1 = require("./utils/db");
+const BankUser_1 = require("./models/BankUser");
 const zkp_1 = require("./utils/zkp");
 dotenv_1.default.config();
 const app = (0, express_1.default)();
-const PORT = process.env.PORT || 3002;
+const port = process.env.PORT || 3002;
 app.use((0, cors_1.default)());
 app.use(express_1.default.json());
-// Mock user data (in a real system, this would be in a secure database)
-const userData = {
-    'user1': {
-        accountBalance: 75000000, // 75 million VND
-        hasBadDebt: false
-    }
-};
-app.post('/api/financial-proof/:userId', async (req, res) => {
+// Connect to MongoDB
+(0, db_1.connectDB)();
+// Get user financial data
+app.get('/api/user/:userId', async (req, res) => {
     try {
-        const { userId } = req.params;
-        const { requiredBalance, requiredNoBadDebt } = req.body;
-        const user = userData[userId];
+        const user = await BankUser_1.BankUser.findOne({ userId: req.params.userId });
         if (!user) {
             return res.status(404).json({ error: 'User not found' });
         }
-        // Generate ZKP proof for financial conditions
+        res.json(user);
+    }
+    catch (error) {
+        console.error('Error fetching user data:', error);
+        res.status(500).json({ error: 'Failed to fetch user data' });
+    }
+});
+// Generate financial proof
+app.post('/api/financial-proof/:userId', async (req, res) => {
+    try {
+        const { requiredBalance, requiredNoBadDebt } = req.body;
+        const user = await BankUser_1.BankUser.findOne({ userId: req.params.userId });
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+        // Generate proof that user meets balance requirement
         const proof = await (0, zkp_1.generateProof)({
             accountBalance: user.accountBalance,
             hasBadDebt: user.hasBadDebt,
@@ -42,6 +53,11 @@ app.post('/api/financial-proof/:userId', async (req, res) => {
         return res.status(500).json({ error: 'Internal server error' });
     }
 });
-app.listen(PORT, () => {
-    console.log(`Bank Server running on port ${PORT}`);
+// Graceful shutdown
+process.on('SIGINT', async () => {
+    await (0, db_1.disconnectDB)();
+    process.exit(0);
+});
+app.listen(port, () => {
+    console.log(`Bank server running on port ${port}`);
 });

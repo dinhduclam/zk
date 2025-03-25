@@ -29,7 +29,6 @@ interface LoanPackage {
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
   const [loanPackages, setLoanPackages] = React.useState<LoanPackage[]>([]);
-  const [selectedPackage, setSelectedPackage] = React.useState<LoanPackage | null>(null);
 
   React.useEffect(() => {
     // Fetch loan packages from the credit institution server
@@ -51,32 +50,6 @@ const Dashboard: React.FC = () => {
       style: 'currency',
       currency: 'VND',
     }).format(amount);
-  };
-
-  const handleApplyLoan = async (packageId: string) => {
-    try {
-      const response = await fetch('http://localhost:3001/api/apply-loan', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          userId: 'user1',
-          loanPackageId: packageId,
-          requirements: {
-            minIncome: selectedPackage?.requirements.minIncome,
-            minBalance: selectedPackage?.requirements.minBalance,
-            noBadDebt: selectedPackage?.requirements.noBadDebt,
-            minAge: selectedPackage?.requirements.minAge,
-            maxAge: selectedPackage?.requirements.maxAge,
-            maritalStatuses: selectedPackage?.requirements.maritalStatuses,
-            criminalRecord: selectedPackage?.requirements.criminalRecord
-          }
-        }),
-      });
-    } catch (error) {
-      console.error('Error applying for loan:', error);
-    }
   };
 
   return (
@@ -125,10 +98,7 @@ const Dashboard: React.FC = () => {
                   variant="contained"
                   color="primary"
                   fullWidth
-                  onClick={() => {
-                    setSelectedPackage(pkg);
-                    navigate(`/apply?package=${pkg._id}`);
-                  }}
+                  onClick={() => navigate(`/apply?package=${pkg._id}`)}
                 >
                   Apply Now
                 </Button>

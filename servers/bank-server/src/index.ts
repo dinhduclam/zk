@@ -1,44 +1,46 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import { connectDB, disconnectDB } from './utils/db';
+import { BankUser } from './models/BankUser';
 import { generateProof } from './utils/zkp';
 
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 3002;
+const port = process.env.PORT || 3002;
 
 app.use(cors());
 app.use(express.json());
 
-interface UserData {
-  accountBalance: number;
-  hasBadDebt: boolean;
-}
+// Connect to MongoDB
+connectDB();
 
-interface UserDatabase {
-  [key: string]: UserData;
-}
-
-// Mock user data (in a real system, this would be in a secure database)
-const userData: UserDatabase = {
-  'user1': {
-    accountBalance: 75000000, // 75 million VND
-    hasBadDebt: false
+// Get user financial data
+app.get('/api/user/:userId', async (req, res) => {
+  try {
+    const user = await BankUser.findOne({ userId: req.params.userId });
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    res.json(user);
+  } catch (error) {
+    console.error('Error fetching user data:', error);
+    res.status(500).json({ error: 'Failed to fetch user data' });
   }
-};
+});
 
+// Generate financial proof
 app.post('/api/financial-proof/:userId', async (req, res) => {
   try {
-    const { userId } = req.params;
     const { requiredBalance, requiredNoBadDebt } = req.body;
-    const user = userData[userId];
+    const user = await BankUser.findOne({ userId: req.params.userId });
 
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }
 
-    // Generate ZKP proof for financial conditions
+    // Generate proof that user meets balance requirement
     const proof = await generateProof({
       accountBalance: user.accountBalance,
       hasBadDebt: user.hasBadDebt,
@@ -55,6 +57,12 @@ app.post('/api/financial-proof/:userId', async (req, res) => {
   }
 });
 
-app.listen(PORT, () => {
-  console.log(`Bank Server running on port ${PORT}`);
+// Graceful shutdown
+process.on('SIGINT', async () => {
+  await disconnectDB();
+  process.exit(0);
+});
+
+app.listen(port, () => {
+  console.log(`Bank server running on port ${port}`);
 });
