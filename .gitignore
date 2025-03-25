@@ -90,6 +90,7 @@ servers/*/logs/
 servers/*/.env
 servers/*/.env.*
 servers/*/node_modules/
+servers/*/dist/
 
 # Frontend specific
 frontend/node_modules/
