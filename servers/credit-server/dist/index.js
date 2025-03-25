@@ -6,76 +6,30 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
 const dotenv_1 = __importDefault(require("dotenv"));
+const db_1 = require("./utils/db");
+const LoanPackage_1 = require("./models/LoanPackage");
 const zkp_1 = require("./utils/zkp");
 dotenv_1.default.config();
 const app = (0, express_1.default)();
-const PORT = process.env.PORT || 3001;
+const port = process.env.PORT || 3001;
 app.use((0, cors_1.default)());
 app.use(express_1.default.json());
-const userDatabase = {
-    user1: {
-        monthlyIncome: 8000,
-        hasCriminalRecord: false,
-        age: 25
+(0, db_1.connectDB)();
+app.get('/api/loan-packages', async (_, res) => {
+    try {
+        const loanPackages = await LoanPackage_1.LoanPackage.find();
+        res.json(loanPackages);
     }
-};
-app.get('/user/:userId', (req, res) => {
-    const { userId } = req.params;
-    const userData = userDatabase[userId];
-    if (!userData) {
-        return res.status(404).json({ error: 'User not found' });
+    catch (error) {
+        console.error('Error fetching loan packages:', error);
+        res.status(500).json({ error: 'Failed to fetch loan packages' });
     }
-    return res.json(userData);
-});
-const loanPackages = [
-    {
-        id: '1',
-        name: 'Basic Loan',
-        amount: 50000000,
-        interestRate: 0.08,
-        term: 12,
-        requirements: {
-            minIncome: 5000000,
-            minBalance: 20000000,
-            requireNoBadDebt: false,
-            minAge: 18,
-            maxAge: 60,
-            requireCriminalRecord: true,
-            requiredMaritalStatus: false
-        }
-    },
-    {
-        id: '2',
-        name: 'Premium Loan',
-        amount: 200000000,
-        interestRate: 0.06,
-        term: 24,
-        requirements: {
-            minIncome: 10000000,
-            minBalance: 50000000,
-            requireNoBadDebt: false,
-            minAge: 30,
-            maxAge: 60,
-            requireCriminalRecord: false,
-            requiredMaritalStatus: true
-        }
-    }
-];
-app.get('/api/loan-packages', (_req, res) => {
-    return res.json(loanPackages);
 });
 app.post('/api/apply-loan', async (req, res) => {
     try {
         const { userId, loanPackageId } = req.body;
-        console.log('Loan application received:', { userId, loanPackageId });
-        const userData = userDatabase[userId];
-        if (!userData) {
-            console.log('User not found:', userId);
-            return res.status(404).json({ error: 'User not found' });
-        }
-        const loanPackage = loanPackages.find(pkg => pkg.id === loanPackageId);
+        const loanPackage = await LoanPackage_1.LoanPackage.findById(loanPackageId);
         if (!loanPackage) {
-            console.log('Loan package not found:', loanPackageId);
             return res.status(404).json({ error: 'Loan package not found' });
         }
         console.log('---------------------------------------');
@@ -135,7 +89,11 @@ app.post('/api/apply-loan', async (req, res) => {
         return res.status(500).json({ error: 'Failed to process loan application' });
     }
 });
-app.listen(PORT, () => {
-    console.log(`Credit Institution Server running on port ${PORT}`);
+process.on('SIGINT', async () => {
+    await (0, db_1.disconnectDB)();
+    process.exit(0);
+});
+app.listen(port, () => {
+    console.log(`Credit server running on port ${port}`);
 });
 //# sourceMappingURL=index.js.map

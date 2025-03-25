@@ -10,7 +10,7 @@ import {
 } from '@mui/material';
 
 interface LoanPackage {
-  id: string;
+  _id: string;
   name: string;
   amount: number;
   interestRate: number;
@@ -42,7 +42,7 @@ const LoanApplication: React.FC = () => {
         try {
           const response = await fetch(`http://localhost:3001/api/loan-packages`);
           const packages = await response.json();
-          const selected = packages.find((pkg: LoanPackage) => pkg.id === packageId);
+          const selected = packages.find((pkg: LoanPackage) => pkg._id === packageId);
           if (selected) {
             setSelectedPackage(selected);
           }
@@ -70,7 +70,7 @@ const LoanApplication: React.FC = () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          loanPackageId: selectedPackage.id,
+          loanPackageId: selectedPackage._id,
           userId: 'user1', // In a real app, this would come from authentication
         }),
       });

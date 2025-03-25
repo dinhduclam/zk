@@ -10,7 +10,7 @@ import {
 } from '@mui/material';
 
 interface LoanPackage {
-  id: string;
+  _id: string;
   name: string;
   amount: number;
   interestRate: number;
@@ -86,7 +86,7 @@ const Dashboard: React.FC = () => {
       </Typography>
       <Grid container spacing={3}>
         {loanPackages.map((pkg) => (
-          <Grid item xs={12} sm={6} md={4} key={pkg.id}>
+          <Grid item xs={12} sm={6} md={4} key={pkg._id}>
             <Card>
               <CardContent>
                 <Typography variant="h6" gutterBottom>
@@ -127,7 +127,7 @@ const Dashboard: React.FC = () => {
                   fullWidth
                   onClick={() => {
                     setSelectedPackage(pkg);
-                    navigate(`/apply?package=${pkg.id}`);
+                    navigate(`/apply?package=${pkg._id}`);
                   }}
                 >
                   Apply Now

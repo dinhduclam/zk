@@ -1,122 +1,40 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import { connectDB, disconnectDB } from './utils/db';
+import { LoanPackage } from './models/LoanPackage';
 import { verifyBankProof, verifyCivilProof, Proof } from './utils/zkp';
 
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 3001;
+const port = process.env.PORT || 3001;
 
 app.use(cors());
 app.use(express.json());
 
-interface UserData {
-  monthlyIncome: number;
-  hasCriminalRecord: boolean;
-  age: number;
-}
+// Connect to MongoDB
+connectDB();
 
-interface UserDatabase {
-  [key: string]: UserData;
-}
-
-// Mock database
-const userDatabase: UserDatabase = {
-  user1: {
-    monthlyIncome: 8000,
-    hasCriminalRecord: false,
-    age: 25
+// Get all loan packagess
+app.get('/api/loan-packages', async (_, res) => {
+  try {
+    const loanPackages = await LoanPackage.find();
+    res.json(loanPackages);
+  } catch (error) {
+    console.error('Error fetching loan packages:', error);
+    res.status(500).json({ error: 'Failed to fetch loan packages' });
   }
-};
-
-
-// Get user data endpoint
-app.get('/user/:userId', (req, res) => {
-  const { userId } = req.params;
-  const userData = userDatabase[userId];
-  
-  if (!userData) {
-    return res.status(404).json({ error: 'User not found' });
-  }
-  
-  return res.json(userData);
 });
 
-// Loan package interface
-interface LoanPackage {
-  id: string;
-  name: string;
-  amount: number;
-  interestRate: number;
-  term: number;
-  requirements: {
-    minIncome: number;
-    minBalance: number;
-    requireNoBadDebt: boolean;
-    minAge: number;
-    maxAge: number;
-    requireCriminalRecord: boolean;
-    requiredMaritalStatus: boolean;
-  };
-}
-
-// Mock loan packages
-const loanPackages: LoanPackage[] = [
-  {
-    id: '1',
-    name: 'Basic Loan',
-    amount: 50000000,
-    interestRate: 0.08,
-    term: 12,
-    requirements: {
-      minIncome: 5000000,
-      minBalance: 20000000,
-      requireNoBadDebt: false,
-      minAge: 18,
-      maxAge: 60,
-      requireCriminalRecord: true,
-      requiredMaritalStatus: false
-    }
-  },
-  {
-    id: '2',
-    name: 'Premium Loan',
-    amount: 200000000,
-    interestRate: 0.06,
-    term: 24,
-    requirements: {
-      minIncome: 10000000,
-      minBalance: 50000000,
-      requireNoBadDebt: false,
-      minAge: 30,
-      maxAge: 60,
-      requireCriminalRecord: false,
-      requiredMaritalStatus: true
-    }
-  }
-];
-
-// Get loan packages endpoint
-app.get('/api/loan-packages', (_req, res) => {
-  return res.json(loanPackages);
-});
-
-// Apply for loan endpoint
+// Apply for a loan
 app.post('/api/apply-loan', async (req, res) => {
   try {
     const { userId, loanPackageId } = req.body;
-    console.log('Loan application received:', { userId, loanPackageId });
-    
-    const userData = userDatabase[userId];
-    if (!userData) {
-      console.log('User not found:', userId);
-      return res.status(404).json({ error: 'User not found' });
-    }
-    
-    const loanPackage = loanPackages.find(pkg => pkg.id === loanPackageId);
+
+    // Get the loan package
+    const loanPackage = await LoanPackage.findById(loanPackageId);
     if (!loanPackage) {
-      console.log('Loan package not found:', loanPackageId);
       return res.status(404).json({ error: 'Loan package not found' });
     }
 
@@ -186,6 +104,12 @@ app.post('/api/apply-loan', async (req, res) => {
   }
 });
 
-app.listen(PORT, () => {
-  console.log(`Credit Institution Server running on port ${PORT}`);
+// Graceful shutdown
+process.on('SIGINT', async () => {
+  await disconnectDB();
+  process.exit(0);
+});
+
+app.listen(port, () => {
+  console.log(`Credit server running on port ${port}`);
 }); 
