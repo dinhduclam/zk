@@ -1,47 +1,47 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import { connectDB, disconnectDB } from './utils/db';
+import { CivilUser } from './models/CivilUser';
 import { generateProof } from './utils/zkp';
 
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 3003;
+const port = process.env.PORT || 3003;
 
 app.use(cors());
 app.use(express.json());
 
-interface UserData {
-  name: string;
-  age: number;
-  hasCriminalRecord: boolean;
-  monthlyIncome: number;
-}
+// Connect to MongoDB
+connectDB();
 
-interface UserDatabase {
-  [key: string]: UserData;
-}
-
-const userData: UserDatabase = {
-  'user1': {
-    name: 'Lam Dinh',
-    age: 25,
-    hasCriminalRecord: false,
-    monthlyIncome: 15000000
-  }
-};
-
-app.post('/api/personal-proof/:userId', async (req, res) => {
+// Get user civil data
+app.get('/api/user/:userId', async (req, res) => {
   try {
-    const { userId } = req.params;
+    const user = await CivilUser.findOne({ userId: req.params.userId });
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    return res.json(user);
+  } catch (error) {
+    console.error('Error fetching user data:', error);
+    return res.status(500).json({ error: 'Failed to fetch user data' });
+  }
+});
+
+// Generate civil proof
+app.post('/api/civil-proof/:userId', async (req, res) => {
+  try {
     const { requiredMonthlyIncome, requiredCriminalRecord, requiredMinimumAge, requiredMaximumAge } = req.body;
-    const user = userData[userId];
+    const user = await CivilUser.findOne({ userId: req.params.userId });
 
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }
 
-    const input = {
+    // Generate proof that user meets age and criminal record requirements
+    const proof = await generateProof({
       age: user.age,
       hasCriminalRecord: user.hasCriminalRecord,
       monthlyIncome: user.monthlyIncome,
@@ -49,17 +49,22 @@ app.post('/api/personal-proof/:userId', async (req, res) => {
       requiredMonthlyIncome,
       requiredCriminalRecord,
       requiredMinimumAge
-    };
-
-    const proof = await generateProof(input);
+    });
 
     console.log("Proof generated: ", proof);
     return res.json(proof);
   } catch (error) {
-    return res.status(500).json({ error: 'Failed to generate proof' });
+    console.error('Error generating civil proof:', error);
+    return res.status(500).json({ error: 'Internal server error' });
   }
 });
 
-app.listen(PORT, () => {
-  console.log(`Civil Database Server running on port ${PORT}`);
+// Graceful shutdown
+process.on('SIGINT', async () => {
+  await disconnectDB();
+  process.exit(0);
+});
+
+app.listen(port, () => {
+  console.log(`Civil server running on port ${port}`);
 });
